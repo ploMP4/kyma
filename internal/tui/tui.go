@@ -12,6 +12,8 @@ import (
 
 type keyMap struct {
 	Quit key.Binding
+	Next key.Binding
+	Prev key.Binding
 }
 
 func (k keyMap) ShortHelp() []key.Binding {
@@ -27,6 +29,14 @@ var keys = keyMap{
 		key.WithKeys("q", "esc", "ctrl+c"),
 		key.WithHelp("q, esc, ctrl+c", "quit"),
 	),
+	Next: key.NewBinding(
+		key.WithKeys("right", "l", " "),
+		key.WithHelp(">, l, <SPC>", "next"),
+	),
+	Prev: key.NewBinding(
+		key.WithKeys("left", "h"),
+		key.WithHelp("<, h", "previous"),
+	),
 }
 
 type model struct {
@@ -34,7 +44,7 @@ type model struct {
 	height int
 
 	slides       []string
-	currentSlide uint
+	currentSlide int
 	keys         keyMap
 	help         help.Model
 }
@@ -60,6 +70,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		if key.Matches(msg, m.keys.Quit) {
 			return m, tea.Quit
+		} else if key.Matches(msg, m.keys.Next) {
+			if m.currentSlide == len(m.slides)-1 {
+				return m, nil
+			}
+			m.currentSlide++
+			return m, nil
+		} else if key.Matches(msg, m.keys.Prev) {
+			if m.currentSlide == 0 {
+				return m, nil
+			}
+			m.currentSlide--
+			return m, nil
 		}
 	}
 
@@ -72,8 +94,8 @@ func (m model) View() string {
 	layout := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color("#9999CC")). // Blueish
-		PaddingLeft(2).
-		PaddingRight(2)
+		Width(m.width - 4).
+		Height(m.height - 2)
 
 	out, err := glamour.Render(m.slides[m.currentSlide], "dark")
 	if err != nil {
