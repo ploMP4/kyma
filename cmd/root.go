@@ -36,7 +36,7 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
-		slides := strings.Split(string(data), "---")
+		slides := strings.Split(string(data), "---\n")
 		for _, slide := range slides {
 			fmt.Println(strings.TrimSpace(slide))
 		}
