@@ -1,14 +1,12 @@
 package tui
 
 import (
-	"math"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/glamour"
-	"github.com/charmbracelet/harmonica"
 	"github.com/charmbracelet/lipgloss"
 
 	"github.com/ploMP4/orama/internal/tui/messages"
@@ -49,28 +47,55 @@ const (
 	damping   = 0.9
 )
 
+func style(width, height int) lipgloss.Style {
+	return lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color("#9999CC")). // Blueish
+		Width(width - 4).
+		Height(height - 2)
+}
+
+type Slide struct {
+	Data       string
+	Prev       *Slide
+	Next       *Slide
+	Style      lipgloss.Style
+	Transition Transition
+}
+
+func (s Slide) View() string {
+	var b strings.Builder
+
+	out, err := glamour.Render(s.Data, "dark")
+	if err != nil {
+		b.WriteString("\n\n" + lipgloss.NewStyle().
+			Foreground(lipgloss.Color("9")). // Red
+			Render("Error: "+err.Error()))
+		return b.String()
+	}
+
+	if s.Transition != nil && s.Transition.Animating() {
+		b.WriteString(s.Transition.View(s.Prev.View(), s.Style.Render(out)))
+	} else {
+		b.WriteString(s.Style.Render(out))
+	}
+	return b.String()
+}
+
 type model struct {
 	width  int
 	height int
 
-	slides       []string
-	currentSlide int
-	keys         keyMap
-	help         help.Model
-
-	spring    harmonica.Spring
-	y         float64
-	yVel      float64
-	animating bool
+	slide *Slide
+	keys  keyMap
+	help  help.Model
 }
 
-func New(slides []string) model {
+func New(rootSlide *Slide) model {
 	return model{
-		slides:       slides,
-		currentSlide: 0,
-		keys:         keys,
-		help:         help.New(),
-		spring:       harmonica.NewSpring(harmonica.FPS(fps), frequency, damping),
+		slide: rootSlide,
+		keys:  keys,
+		help:  help.New(),
 	}
 }
 
@@ -82,84 +107,44 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
+		slide := m.slide
+		for slide != nil {
+			slide.Style = style(m.width, m.height)
+			slide = slide.Next
+		}
 		return m, nil
 	case tea.KeyMsg:
 		if key.Matches(msg, m.keys.Quit) {
 			return m, tea.Quit
 		} else if key.Matches(msg, m.keys.Next) {
-			if m.currentSlide == len(m.slides)-1 || m.animating {
+			if m.slide.Next == nil {
 				return m, nil
 			}
-			m.animating = true
-			m.y = 0
-			m.yVel = 0
+			m.slide = m.slide.Next
+			m.slide.Transition = m.slide.Transition.Start(m.width, m.height)
 			return m, messages.Animate(fps)
 		} else if key.Matches(msg, m.keys.Prev) {
-			if m.currentSlide == 0 || m.animating {
+			if m.slide.Prev == nil {
 				return m, nil
 			}
-			m.currentSlide--
+			m.slide = m.slide.Prev
 			return m, nil
 		}
 	case messages.FrameMsg:
-		targetY := float64(m.height)
-
-		m.y, m.yVel = m.spring.Update(m.y, m.yVel, targetY)
-
-		if m.y >= targetY {
-			m.animating = false
-			m.currentSlide++
-			return m, nil
-		}
-
-		return m, messages.Animate(fps)
+		transition, cmd := m.slide.Transition.Update()
+		m.slide.Transition = transition
+		return m, cmd
 	}
 
 	return m, nil
 }
 
 func (m model) View() string {
-	var s strings.Builder
-
-	y := int(math.Round(m.y))
-
-	layout := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("#9999CC")). // Blueish
-		Width(m.width - 4).
-		Height(m.height - 2)
-
-	out, err := glamour.Render(m.slides[m.currentSlide], "dark")
-	if err != nil {
-		s.WriteString("\n\n" + lipgloss.NewStyle().
-			Foreground(lipgloss.Color("9")). // Red
-			Render("Error: "+err.Error()))
-		return s.String()
-	}
-
-	s.WriteString(layout.Render(out))
-
-	if m.animating {
-		outNext, err := glamour.Render(m.slides[m.currentSlide+1], "dark")
-		if err != nil {
-			s.WriteString("\n\n" + lipgloss.NewStyle().
-				Foreground(lipgloss.Color("9")). // Red
-				Render("Error: "+err.Error()))
-			return s.String()
-		}
-
-		lines := strings.Split(layout.Render(outNext), "\n")
-		if y > len(lines) {
-			y = len(lines)
-		}
-		s.WriteString("\n" + strings.Join(lines[:y], "\n"))
-	}
-
 	return lipgloss.Place(
 		m.width,
 		m.height,
 		lipgloss.Center,
 		lipgloss.Center,
-		s.String(),
+		m.slide.View(),
 	)
 }

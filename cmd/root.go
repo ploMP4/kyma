@@ -37,11 +37,23 @@ var rootCmd = &cobra.Command{
 		}
 
 		slides := strings.Split(string(data), "---\n")
-		for _, slide := range slides {
-			fmt.Println(strings.TrimSpace(slide))
+
+		root := &tui.Slide{
+			Data:       slides[0],
+			Transition: tui.NewVerticalSlideTransition(60),
 		}
 
-		p := tea.NewProgram(tui.New(slides), tea.WithAltScreen(), tea.WithMouseAllMotion())
+		curr := root
+		for _, slide := range slides[1:] {
+			curr.Next = &tui.Slide{
+				Data:       slide,
+				Transition: tui.NewVerticalSlideTransition(60),
+				Prev:       curr,
+			}
+			curr = curr.Next
+		}
+
+		p := tea.NewProgram(tui.New(root), tea.WithAltScreen(), tea.WithMouseAllMotion())
 		if _, err := p.Run(); err != nil {
 			return err
 		}
