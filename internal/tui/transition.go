@@ -40,6 +40,8 @@ func NewVerticalSlideTransition(fps int) verticalSlideTransition {
 func (t verticalSlideTransition) Start(_, height int) Transition {
 	t.height = height
 	t.animating = true
+	t.y = 0
+	t.yVel = 0
 	return t
 }
 

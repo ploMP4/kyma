@@ -117,14 +117,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if key.Matches(msg, m.keys.Quit) {
 			return m, tea.Quit
 		} else if key.Matches(msg, m.keys.Next) {
-			if m.slide.Next == nil {
+			if m.slide.Next == nil || m.slide.Transition.Animating() {
 				return m, nil
 			}
 			m.slide = m.slide.Next
 			m.slide.Transition = m.slide.Transition.Start(m.width, m.height)
 			return m, messages.Animate(fps)
 		} else if key.Matches(msg, m.keys.Prev) {
-			if m.slide.Prev == nil {
+			if m.slide.Prev == nil || m.slide.Transition.Animating() {
 				return m, nil
 			}
 			m.slide = m.slide.Prev
