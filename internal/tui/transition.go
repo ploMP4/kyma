@@ -18,6 +18,28 @@ type Transition interface {
 	View(prev, next string) string
 }
 
+type noTransition struct{}
+
+func NewNoTransition() noTransition {
+	return noTransition{}
+}
+
+func (t noTransition) Start(width int, height int) Transition {
+	return t
+}
+
+func (t noTransition) Animating() bool {
+	return false
+}
+
+func (t noTransition) Update() (Transition, tea.Cmd) {
+	return t, nil
+}
+
+func (notransition noTransition) View(prev string, next string) string {
+	return ""
+}
+
 type verticalSlideTransition struct {
 	height    int
 	fps       int
