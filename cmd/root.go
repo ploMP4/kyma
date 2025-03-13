@@ -40,14 +40,14 @@ var rootCmd = &cobra.Command{
 
 		root := &tui.Slide{
 			Data:       slides[0],
-			Transition: tui.NewVerticalSlideTransition(60),
+			Transition: tui.NewVerticalSlideDownTransition(60),
 		}
 
 		curr := root
 		for _, slide := range slides[1:] {
 			curr.Next = &tui.Slide{
 				Data:       slide,
-				Transition: tui.NewVerticalSlideTransition(60),
+				Transition: tui.NewVerticalSlideUpTransition(60),
 				Prev:       curr,
 			}
 			curr = curr.Next
