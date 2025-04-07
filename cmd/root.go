@@ -24,7 +24,7 @@ var rootCmd = &cobra.Command{
 		}
 
 		if filepath.Ext(args[0]) != ".md" {
-			return fmt.Errorf("Expected markdown file got: %v", args[0])
+			return fmt.Errorf("expected markdown file got: %v", args[0])
 		}
 		return nil
 	},
@@ -36,21 +36,9 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
-		slides := strings.Split(string(data), "---\n")
-
-		root := &tui.Slide{
-			Data:       slides[0],
-			Transition: tui.NewHorizontalSlideLeftTransition(60),
-		}
-
-		curr := root
-		for _, slide := range slides[1:] {
-			curr.Next = &tui.Slide{
-				Data:       slide,
-				Transition: tui.NewHorizontalSlideLeftTransition(60),
-				Prev:       curr,
-			}
-			curr = curr.Next
+		root, err := parseSildes(string(data))
+		if err != nil {
+			return err
 		}
 
 		p := tea.NewProgram(tui.New(root), tea.WithAltScreen(), tea.WithMouseAllMotion())
@@ -67,4 +55,49 @@ func Execute() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+}
+
+func parseSildes(data string) (*tui.Slide, error) {
+	slides := strings.Split(string(data), "----\n")
+
+	rootSlide, properties := parseSlide(slides[0])
+	p, err := tui.NewProperties(properties)
+	if err != nil {
+		return nil, err
+	}
+
+	root := &tui.Slide{
+		Data:       rootSlide,
+		Properties: p,
+	}
+
+	curr := root
+	for _, slide := range slides[1:] {
+		slide, properties := parseSlide(slide)
+		p, err := tui.NewProperties(properties)
+		if err != nil {
+			return nil, err
+		}
+
+		curr.Next = &tui.Slide{
+			Data:       slide,
+			Prev:       curr,
+			Properties: p,
+		}
+		curr = curr.Next
+	}
+
+	return root, nil
+}
+
+func parseSlide(s string) (slide, properties string) {
+	slide = s
+
+	if strings.HasPrefix(strings.TrimSpace(s), "---\n") {
+		parts := strings.Split(s, "---\n")
+		properties = parts[1]
+		slide = parts[2]
+	}
+
+	return slide, properties
 }

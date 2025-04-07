@@ -21,9 +21,24 @@ type Transition interface {
 	View(prev, next string) string
 }
 
+func getTransition(name string, fps int) Transition {
+	switch name {
+	case "verticalUp":
+		return NewVerticalSlideUpTransition(fps)
+	case "verticalDown":
+		return NewVerticalSlideDownTransition(fps)
+	case "swipe":
+		return NewHorizontalSlideLeftTransition(fps)
+	case "flip":
+		return NewPageFlipRightTransition(fps)
+	default:
+		return NewNoTransition(fps)
+	}
+}
+
 type noTransition struct{}
 
-func NewNoTransition() noTransition {
+func NewNoTransition(_ int) noTransition {
 	return noTransition{}
 }
 

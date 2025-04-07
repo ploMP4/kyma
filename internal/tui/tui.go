@@ -1,12 +1,11 @@
 package tui
 
 import (
-	"strings"
+	"reflect"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
 
 	"github.com/ploMP4/orama/internal/tui/messages"
@@ -41,45 +40,29 @@ var keys = keyMap{
 	),
 }
 
-const (
-	fps       = 60
-	frequency = 7.0
-	damping   = 0.9
-)
+const fps = 60
 
-func style(width, height int) lipgloss.Style {
+type StyleConfig struct {
+	Border      lipgloss.Border
+	BorderColor string
+}
+
+func style(width, height int, extra StyleConfig) lipgloss.Style {
+	border := lipgloss.NormalBorder()
+	if !reflect.ValueOf(extra.Border).IsZero() {
+		border = extra.Border
+	}
+
+	borderColor := "#9999CC" // Blueish
+	if extra.BorderColor != "" {
+		borderColor = extra.BorderColor
+	}
+
 	return lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("#9999CC")). // Blueish
+		Border(border).
+		BorderForeground(lipgloss.Color(borderColor)).
 		Width(width - 4).
 		Height(height - 2)
-}
-
-type Slide struct {
-	Data       string
-	Prev       *Slide
-	Next       *Slide
-	Style      lipgloss.Style
-	Transition Transition
-}
-
-func (s Slide) View() string {
-	var b strings.Builder
-
-	out, err := glamour.Render(s.Data, "dark")
-	if err != nil {
-		b.WriteString("\n\n" + lipgloss.NewStyle().
-			Foreground(lipgloss.Color("9")). // Red
-			Render("Error: "+err.Error()))
-		return b.String()
-	}
-
-	if s.Transition != nil && s.Transition.Animating() {
-		b.WriteString(s.Transition.View(s.Prev.View(), s.Style.Render(out)))
-	} else {
-		b.WriteString(s.Style.Render(out))
-	}
-	return b.String()
 }
 
 type model struct {
@@ -109,7 +92,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width, m.height = msg.Width, msg.Height
 		slide := m.slide
 		for slide != nil {
-			slide.Style = style(m.width, m.height)
+			slide.Style = style(m.width, m.height, slide.Properties.Style)
 			slide = slide.Next
 		}
 		return m, nil
@@ -117,22 +100,22 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if key.Matches(msg, m.keys.Quit) {
 			return m, tea.Quit
 		} else if key.Matches(msg, m.keys.Next) {
-			if m.slide.Next == nil || m.slide.Transition.Animating() {
+			if m.slide.Next == nil || m.slide.Properties.Transition.Animating() {
 				return m, nil
 			}
 			m.slide = m.slide.Next
-			m.slide.Transition = m.slide.Transition.Start(m.width, m.height)
+			m.slide.Properties.Transition = m.slide.Properties.Transition.Start(m.width, m.height)
 			return m, messages.Animate(fps)
 		} else if key.Matches(msg, m.keys.Prev) {
-			if m.slide.Prev == nil || m.slide.Transition.Animating() {
+			if m.slide.Prev == nil || m.slide.Properties.Transition.Animating() {
 				return m, nil
 			}
 			m.slide = m.slide.Prev
-			return m, nil
+			return m, messages.Animate(fps)
 		}
 	case messages.FrameMsg:
-		transition, cmd := m.slide.Transition.Update()
-		m.slide.Transition = transition
+		transition, cmd := m.slide.Properties.Transition.Update()
+		m.slide.Properties.Transition = transition
 		return m, cmd
 	}
 
