@@ -6,6 +6,8 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/goccy/go-yaml"
+
+	"github.com/ploMP4/orama/internal/tui/transitions"
 )
 
 type propertyConfig struct {
@@ -39,12 +41,12 @@ func getBorder(border string) lipgloss.Border {
 
 type Properties struct {
 	Style      StyleConfig
-	Transition Transition
+	Transition transitions.Transition
 }
 
 func NewProperties(properties string) (Properties, error) {
 	if properties == "" {
-		return Properties{Transition: getTransition("default", fps)}, nil
+		return Properties{Transition: transitions.Get("default", fps)}, nil
 	}
 
 	var p propertyConfig
@@ -57,7 +59,7 @@ func NewProperties(properties string) (Properties, error) {
 			Border:      getBorder(p.Style.Border),
 			BorderColor: p.Style.BorderColor,
 		},
-		Transition: getTransition(p.Transition, fps),
+		Transition: transitions.Get(p.Transition, fps),
 	}, nil
 }
 
