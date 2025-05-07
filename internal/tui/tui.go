@@ -102,8 +102,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, messages.Animate(fps)
 		}
 	case messages.FrameMsg:
-		transition, cmd := m.slide.Properties.Transition.Update()
-		m.slide.Properties.Transition = transition
+		slide, cmd := m.slide.Update()
+		m.slide = slide
 		return m, cmd
 	}
 

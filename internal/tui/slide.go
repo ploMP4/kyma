@@ -3,6 +3,7 @@ package tui
 import (
 	"strings"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/goccy/go-yaml"
@@ -16,9 +17,28 @@ type Slide struct {
 	Next       *Slide
 	Style      lipgloss.Style
 	Properties Properties
+
+	preRenderedFrame string
+}
+
+func (s *Slide) Update() (*Slide, tea.Cmd) {
+	transition, cmd := s.Properties.Transition.Update()
+	s.Properties.Transition = transition
+	s.preRenderedFrame = s.view()
+	if cmd == nil {
+		s.preRenderedFrame = ""
+	}
+	return s, cmd
 }
 
 func (s Slide) View() string {
+	if s.preRenderedFrame == "" {
+		return s.view()
+	}
+	return s.preRenderedFrame
+}
+
+func (s Slide) view() string {
 	var b strings.Builder
 
 	out, err := glamour.Render(s.Data, "dark")
