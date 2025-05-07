@@ -10,59 +10,6 @@ import (
 	"github.com/ploMP4/orama/internal/tui/transitions"
 )
 
-type propertyConfig struct {
-	Style struct {
-		Border      string `yaml:"border"`
-		BorderColor string `yaml:"border_color"`
-	} `yaml:"style"`
-	Transition string `yaml:"transition"`
-}
-
-func getBorder(border string) lipgloss.Border {
-	switch border {
-	case "rounded":
-		return lipgloss.RoundedBorder()
-	case "double":
-		return lipgloss.DoubleBorder()
-	case "thick":
-		return lipgloss.ThickBorder()
-	case "hidden":
-		return lipgloss.HiddenBorder()
-	case "block":
-		return lipgloss.BlockBorder()
-	case "innerHalfBlock":
-		return lipgloss.InnerHalfBlockBorder()
-	case "outerHalfBlock":
-		return lipgloss.OuterHalfBlockBorder()
-	default:
-		return lipgloss.NormalBorder()
-	}
-}
-
-type Properties struct {
-	Style      StyleConfig
-	Transition transitions.Transition
-}
-
-func NewProperties(properties string) (Properties, error) {
-	if properties == "" {
-		return Properties{Transition: transitions.Get("default", fps)}, nil
-	}
-
-	var p propertyConfig
-	if err := yaml.Unmarshal([]byte(properties), &p); err != nil {
-		return Properties{}, err
-	}
-
-	return Properties{
-		Style: StyleConfig{
-			Border:      getBorder(p.Style.Border),
-			BorderColor: p.Style.BorderColor,
-		},
-		Transition: transitions.Get(p.Transition, fps),
-	}, nil
-}
-
 type Slide struct {
 	Data       string
 	Prev       *Slide
@@ -88,4 +35,37 @@ func (s Slide) View() string {
 		b.WriteString(s.Style.Render(out))
 	}
 	return b.String()
+}
+
+type Properties struct {
+	Style      StyleConfig            `yaml:"style"`
+	Transition transitions.Transition `yaml:"transition"`
+}
+
+func (p *Properties) UnmarshalYAML(bytes []byte) error {
+	aux := struct {
+		Style      StyleConfig `yaml:"style"`
+		Transition string      `yaml:"transition"`
+	}{}
+
+	if err := yaml.Unmarshal(bytes, &aux); err != nil {
+		return err
+	}
+	p.Transition = transitions.Get(aux.Transition, fps)
+	p.Style = aux.Style
+
+	return nil
+}
+
+func NewProperties(properties string) (Properties, error) {
+	if properties == "" {
+		return Properties{Transition: transitions.Get("default", fps)}, nil
+	}
+
+	var p Properties
+	if err := yaml.Unmarshal([]byte(properties), &p); err != nil {
+		return Properties{}, err
+	}
+
+	return p, nil
 }

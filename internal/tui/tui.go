@@ -1,8 +1,6 @@
 package tui
 
 import (
-	"reflect"
-
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -42,24 +40,14 @@ var keys = keyMap{
 
 const fps = 60
 
-type StyleConfig struct {
-	Border      lipgloss.Border
-	BorderColor string
-}
-
 func style(width, height int, extra StyleConfig) lipgloss.Style {
-	border := lipgloss.NormalBorder()
-	if !reflect.ValueOf(extra.Border).IsZero() {
-		border = extra.Border
-	}
-
 	borderColor := "#9999CC" // Blueish
 	if extra.BorderColor != "" {
 		borderColor = extra.BorderColor
 	}
 
 	return lipgloss.NewStyle().
-		Border(border).
+		Border(extra.Border).
 		BorderForeground(lipgloss.Color(borderColor)).
 		Width(width - 4).
 		Height(height - 2)
