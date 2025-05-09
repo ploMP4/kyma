@@ -46,7 +46,7 @@ func style(width, height int, extra StyleConfig) lipgloss.Style {
 		borderColor = extra.BorderColor
 	}
 
-	return lipgloss.NewStyle().
+	return extra.Layout.
 		Border(extra.Border).
 		BorderForeground(lipgloss.Color(borderColor)).
 		Width(width - 4).
