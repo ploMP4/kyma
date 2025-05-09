@@ -54,6 +54,8 @@ func getBorder(border string) lipgloss.Border {
 		return lipgloss.InnerHalfBlockBorder()
 	case "outerHalfBlock":
 		return lipgloss.OuterHalfBlockBorder()
+	case "normal":
+		fallthrough
 	default:
 		return lipgloss.NormalBorder()
 	}
