@@ -6,7 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/ploMP4/orama/internal/tui/messages"
+	"github.com/ploMP4/kyma/internal/tui/messages"
 )
 
 type keyMap struct {

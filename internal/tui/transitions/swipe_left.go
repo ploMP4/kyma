@@ -9,8 +9,8 @@ import (
 	"github.com/charmbracelet/harmonica"
 	"github.com/muesli/reflow/truncate"
 
-	"github.com/ploMP4/orama/internal/skip"
-	"github.com/ploMP4/orama/internal/tui/messages"
+	"github.com/ploMP4/kyma/internal/skip"
+	"github.com/ploMP4/kyma/internal/tui/messages"
 )
 
 type swipeLeft struct {
@@ -24,7 +24,7 @@ type swipeLeft struct {
 
 func newSwipeLeft(fps int) swipeLeft {
 	const frequency = 7.0
-	const damping = 0.8
+	const damping = 0.75
 
 	return swipeLeft{
 		fps:    fps,

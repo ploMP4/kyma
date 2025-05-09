@@ -9,7 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 
-	"github.com/ploMP4/orama/internal/tui"
+	"github.com/ploMP4/kyma/internal/tui"
 )
 
 func init() {
@@ -17,7 +17,7 @@ func init() {
 }
 
 var rootCmd = &cobra.Command{
-	Use: "orama <filename>",
+	Use: "kyma <filename>",
 	Args: func(cmd *cobra.Command, args []string) error {
 		if err := cobra.ExactArgs(1)(cmd, args); err != nil {
 			return err

@@ -10,7 +10,7 @@ import (
 	"github.com/muesli/reflow/truncate"
 	"github.com/muesli/reflow/wordwrap"
 
-	"github.com/ploMP4/orama/internal/tui/messages"
+	"github.com/ploMP4/kyma/internal/tui/messages"
 )
 
 type flipRight struct {

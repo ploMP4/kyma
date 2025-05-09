@@ -8,7 +8,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/goccy/go-yaml"
 
-	"github.com/ploMP4/orama/internal/tui/transitions"
+	"github.com/ploMP4/kyma/internal/tui/transitions"
 )
 
 type Slide struct {

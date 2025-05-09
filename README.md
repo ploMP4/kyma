@@ -1,4 +1,4 @@
-# Orama
+# Kyma
 
 Create presentations in the terminal from markdown files with fancy transitions.
 
@@ -7,7 +7,7 @@ Create presentations in the terminal from markdown files with fancy transitions.
 ## Install
 
 ```bash
-go install github.com/ploMP4/orama@latest
+go install github.com/ploMP4/kyma@latest
 ```
 
 ## How it works

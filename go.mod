@@ -1,4 +1,4 @@
-module github.com/ploMP4/orama
+module github.com/ploMP4/kyma
 
 go 1.24.1
 
