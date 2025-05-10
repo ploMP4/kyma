@@ -36,7 +36,7 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
-		root, err := parseSildes(string(data))
+		root, err := parseSlides(string(data))
 		if err != nil {
 			return err
 		}
@@ -57,7 +57,7 @@ func Execute() {
 	}
 }
 
-func parseSildes(data string) (*tui.Slide, error) {
+func parseSlides(data string) (*tui.Slide, error) {
 	slides := strings.Split(string(data), "----\n")
 
 	rootSlide, properties := parseSlide(slides[0])
