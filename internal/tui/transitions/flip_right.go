@@ -20,6 +20,7 @@ type flipRight struct {
 	x         float64
 	xVel      float64
 	animating bool
+	direction direction
 }
 
 func newFlipRight(fps int) flipRight {
@@ -32,11 +33,12 @@ func newFlipRight(fps int) flipRight {
 	}
 }
 
-func (t flipRight) Start(width int, _ int) Transition {
+func (t flipRight) Start(width int, _ int, direction direction) Transition {
 	t.width = width
 	t.animating = true
 	t.x = 0
 	t.xVel = 0
+	t.direction = direction
 	return t
 }
 
@@ -81,4 +83,16 @@ func (t flipRight) View(prev string, next string) string {
 	}
 
 	return s.String()
+}
+
+func (t flipRight) Name() string {
+	return "flipRight"
+}
+
+func (t flipRight) Opposite() Transition {
+	return t
+}
+
+func (t flipRight) Direction() direction {
+	return t.direction
 }

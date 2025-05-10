@@ -18,6 +18,7 @@ type slideDown struct {
 	y         float64
 	yVel      float64
 	animating bool
+	direction direction
 }
 
 func newSlideDown(fps int) slideDown {
@@ -30,11 +31,12 @@ func newSlideDown(fps int) slideDown {
 	}
 }
 
-func (t slideDown) Start(_, height int) Transition {
+func (t slideDown) Start(_, height int, direction direction) Transition {
 	t.height = height
 	t.animating = true
 	t.y = 0
 	t.yVel = 0
+	t.direction = direction
 	return t
 }
 
@@ -73,4 +75,16 @@ func (t slideDown) View(prev, next string) string {
 	s.WriteString("\n" + strings.Join(prevLines[:len(prevLines)-y], "\n"))
 
 	return s.String()
+}
+
+func (t slideDown) Name() string {
+	return "slideDown"
+}
+
+func (t slideDown) Opposite() Transition {
+	return newSlideUp(t.fps)
+}
+
+func (t slideDown) Direction() direction {
+	return t.direction
 }

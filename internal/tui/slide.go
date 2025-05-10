@@ -50,7 +50,12 @@ func (s Slide) view() string {
 	}
 
 	if s.Properties.Transition != nil && s.Properties.Transition.Animating() {
-		b.WriteString(s.Properties.Transition.View(s.Prev.View(), s.Style.Render(out)))
+		direction := s.Properties.Transition.Direction()
+		if direction == transitions.Backwards {
+			b.WriteString(s.Properties.Transition.View(s.Next.View(), s.Style.Render(out)))
+		} else {
+			b.WriteString(s.Properties.Transition.View(s.Prev.View(), s.Style.Render(out)))
+		}
 	} else {
 		b.WriteString(s.Style.Render(out))
 	}
@@ -58,8 +63,9 @@ func (s Slide) view() string {
 }
 
 type Properties struct {
-	Style      StyleConfig            `yaml:"style"`
-	Transition transitions.Transition `yaml:"transition"`
+	Style               StyleConfig            `yaml:"style"`
+	Transition          transitions.Transition `yaml:"transition"`
+	_OriginalTransition transitions.Transition // Should never be mutated
 }
 
 func (p *Properties) UnmarshalYAML(bytes []byte) error {
@@ -71,7 +77,9 @@ func (p *Properties) UnmarshalYAML(bytes []byte) error {
 	if err := yaml.Unmarshal(bytes, &aux); err != nil {
 		return err
 	}
-	p.Transition = transitions.Get(aux.Transition, fps)
+	transition := transitions.Get(aux.Transition, fps)
+	p.Transition = transition
+	p._OriginalTransition = transition
 	p.Style = aux.Style
 
 	return nil
@@ -79,7 +87,11 @@ func (p *Properties) UnmarshalYAML(bytes []byte) error {
 
 func NewProperties(properties string) (Properties, error) {
 	if properties == "" {
-		return Properties{Transition: transitions.Get("default", fps)}, nil
+		transition := transitions.Get("default", fps)
+		return Properties{
+			Transition:          transition,
+			_OriginalTransition: transition,
+		}, nil
 	}
 
 	var p Properties
