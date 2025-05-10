@@ -7,6 +7,7 @@ type Transition interface {
 	Animating() bool
 	Update() (Transition, tea.Cmd)
 	View(prev, next string) string
+	Opposite() Transition
 	Name() string
 }
 

@@ -27,3 +27,7 @@ func (notransition noTransition) View(prev string, next string) string {
 func (t noTransition) Name() string {
 	return "none"
 }
+
+func (t noTransition) Opposite() Transition {
+	return t
+}

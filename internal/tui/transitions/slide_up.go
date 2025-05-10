@@ -74,3 +74,7 @@ func (t slideUp) View(prev, next string) string {
 func (t slideUp) Name() string {
 	return "slideUp"
 }
+
+func (t slideUp) Opposite() Transition {
+	return newSlideDown(t.fps)
+}
