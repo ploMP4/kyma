@@ -31,3 +31,8 @@ func (t noTransition) Name() string {
 func (t noTransition) Opposite() Transition {
 	return t
 }
+
+func (t noTransition) Direction() direction {
+	// don't care, no anim
+	return Forwards
+}

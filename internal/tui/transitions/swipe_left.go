@@ -20,6 +20,7 @@ type swipeLeft struct {
 	x         float64
 	xVel      float64
 	animating bool
+	direction direction
 }
 
 func newSwipeLeft(fps int) swipeLeft {
@@ -37,6 +38,7 @@ func (t swipeLeft) Start(width int, _ int) Transition {
 	t.animating = true
 	t.x = 0
 	t.xVel = 0
+	t.direction = direction
 	return t
 }
 
@@ -87,4 +89,8 @@ func (t swipeLeft) Name() string {
 
 func (t swipeLeft) Opposite() Transition {
 	return newSwipeRight(t.fps)
+}
+
+func (t swipeLeft) Direction() direction {
+	return t.direction
 }

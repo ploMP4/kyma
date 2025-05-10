@@ -18,6 +18,7 @@ type slideUp struct {
 	y         float64
 	yVel      float64
 	animating bool
+	direction direction
 }
 
 func newSlideUp(fps int) slideUp {
@@ -35,6 +36,7 @@ func (t slideUp) Start(_, height int) Transition {
 	t.animating = true
 	t.y = 0
 	t.yVel = 0
+	t.direction = direction
 	return t
 }
 
@@ -77,4 +79,8 @@ func (t slideUp) Name() string {
 
 func (t slideUp) Opposite() Transition {
 	return newSlideDown(t.fps)
+}
+
+func (t slideUp) Direction() direction {
+	return t.direction
 }
