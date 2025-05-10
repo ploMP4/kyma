@@ -2,6 +2,13 @@ package transitions
 
 import tea "github.com/charmbracelet/bubbletea"
 
+type direction byte
+
+const (
+	Forwards  direction = 0
+	Backwards direction = 1
+)
+
 type Transition interface {
 	Start(width, height int) Transition
 	Animating() bool
