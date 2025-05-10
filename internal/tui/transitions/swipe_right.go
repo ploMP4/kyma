@@ -79,4 +79,12 @@ func (t swipeRight) View(prev string, next string) string {
 		}
 	}
 	return s.String()
-} 
+}
+
+func (t swipeRight) Name() string {
+	return "swipeRight"
+}
+
+func (t swipeRight) Opposite() Transition {
+	return newSwipeLeft(t.fps)
+}

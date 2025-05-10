@@ -82,3 +82,11 @@ func (t flipRight) View(prev string, next string) string {
 
 	return s.String()
 }
+
+func (t flipRight) Name() string {
+	return "flipRight"
+}
+
+func (t flipRight) Opposite() Transition {
+	return t
+}

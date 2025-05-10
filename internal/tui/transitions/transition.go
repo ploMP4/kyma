@@ -7,6 +7,8 @@ type Transition interface {
 	Animating() bool
 	Update() (Transition, tea.Cmd)
 	View(prev, next string) string
+	Opposite() Transition
+	Name() string
 }
 
 func Get(name string, fps int) Transition {
