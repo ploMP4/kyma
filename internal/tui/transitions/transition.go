@@ -16,6 +16,7 @@ type Transition interface {
 	View(prev, next string) string
 	Opposite() Transition
 	Name() string
+	Direction() direction
 }
 
 func Get(name string, fps int) Transition {
