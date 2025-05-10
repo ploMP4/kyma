@@ -50,7 +50,12 @@ func (s Slide) view() string {
 	}
 
 	if s.Properties.Transition != nil && s.Properties.Transition.Animating() {
-		b.WriteString(s.Properties.Transition.View(s.Prev.View(), s.Style.Render(out)))
+		direction := s.Properties.Transition.Direction()
+		if direction == transitions.Backwards {
+			b.WriteString(s.Properties.Transition.View(s.Next.View(), s.Style.Render(out)))
+		} else {
+			b.WriteString(s.Properties.Transition.View(s.Prev.View(), s.Style.Render(out)))
+		}
 	} else {
 		b.WriteString(s.Style.Render(out))
 	}

@@ -31,7 +31,7 @@ func newSlideDown(fps int) slideDown {
 	}
 }
 
-func (t slideDown) Start(_, height int) Transition {
+func (t slideDown) Start(_, height int, direction direction) Transition {
 	t.height = height
 	t.animating = true
 	t.y = 0

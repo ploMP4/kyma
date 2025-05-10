@@ -31,7 +31,7 @@ func newSlideUp(fps int) slideUp {
 	}
 }
 
-func (t slideUp) Start(_, height int) Transition {
+func (t slideUp) Start(_, height int, direction direction) Transition {
 	t.height = height
 	t.animating = true
 	t.y = 0

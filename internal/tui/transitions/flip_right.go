@@ -33,7 +33,7 @@ func newFlipRight(fps int) flipRight {
 	}
 }
 
-func (t flipRight) Start(width int, _ int) Transition {
+func (t flipRight) Start(width int, _ int, direction direction) Transition {
 	t.width = width
 	t.animating = true
 	t.x = 0
