@@ -74,3 +74,7 @@ func (t slideDown) View(prev, next string) string {
 
 	return s.String()
 }
+
+func (t slideDown) Name() string {
+	return "slideDown"
+}

@@ -79,4 +79,8 @@ func (t swipeRight) View(prev string, next string) string {
 		}
 	}
 	return s.String()
-} 
+}
+
+func (t swipeRight) Name() string {
+	return "swipeRight"
+}

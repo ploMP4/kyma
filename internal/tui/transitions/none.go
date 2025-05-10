@@ -23,3 +23,7 @@ func (t noTransition) Update() (Transition, tea.Cmd) {
 func (notransition noTransition) View(prev string, next string) string {
 	return ""
 }
+
+func (t noTransition) Name() string {
+	return "none"
+}

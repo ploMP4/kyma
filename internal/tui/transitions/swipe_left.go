@@ -80,3 +80,7 @@ func (t swipeLeft) View(prev string, next string) string {
 	}
 	return s.String()
 }
+
+func (t swipeLeft) Name() string {
+	return "swipeLeft"
+}

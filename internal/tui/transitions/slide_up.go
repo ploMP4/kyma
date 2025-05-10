@@ -70,3 +70,7 @@ func (t slideUp) View(prev, next string) string {
 
 	return s.String()
 }
+
+func (t slideUp) Name() string {
+	return "slideUp"
+}
