@@ -12,18 +12,19 @@ import (
 )
 
 type Slide struct {
-	Data       string
-	Prev       *Slide
-	Next       *Slide
-	Style      lipgloss.Style
-	Properties Properties
+	Data             string
+	Prev             *Slide
+	Next             *Slide
+	Style            lipgloss.Style
+	ActiveTransition transitions.Transition
+	Properties       Properties
 
 	preRenderedFrame string
 }
 
 func (s *Slide) Update() (*Slide, tea.Cmd) {
-	transition, cmd := s.Properties.Transition.Update()
-	s.Properties.Transition = transition
+	transition, cmd := s.ActiveTransition.Update()
+	s.ActiveTransition = transition
 	s.preRenderedFrame = s.view()
 	if cmd == nil {
 		s.preRenderedFrame = ""
@@ -49,12 +50,12 @@ func (s Slide) view() string {
 		return b.String()
 	}
 
-	if s.Properties.Transition != nil && s.Properties.Transition.Animating() {
-		direction := s.Properties.Transition.Direction()
+	if s.ActiveTransition != nil && s.ActiveTransition.Animating() {
+		direction := s.ActiveTransition.Direction()
 		if direction == transitions.Backwards {
-			b.WriteString(s.Properties.Transition.View(s.Next.View(), s.Style.Render(out)))
+			b.WriteString(s.ActiveTransition.View(s.Next.View(), s.Style.Render(out)))
 		} else {
-			b.WriteString(s.Properties.Transition.View(s.Prev.View(), s.Style.Render(out)))
+			b.WriteString(s.ActiveTransition.View(s.Prev.View(), s.Style.Render(out)))
 		}
 	} else {
 		b.WriteString(s.Style.Render(out))
@@ -63,9 +64,8 @@ func (s Slide) view() string {
 }
 
 type Properties struct {
-	Style               StyleConfig            `yaml:"style"`
-	Transition          transitions.Transition `yaml:"transition"`
-	_OriginalTransition transitions.Transition // Should never be mutated
+	Style      StyleConfig            `yaml:"style"`
+	Transition transitions.Transition `yaml:"transition"`
 }
 
 func (p *Properties) UnmarshalYAML(bytes []byte) error {
@@ -77,9 +77,7 @@ func (p *Properties) UnmarshalYAML(bytes []byte) error {
 	if err := yaml.Unmarshal(bytes, &aux); err != nil {
 		return err
 	}
-	transition := transitions.Get(aux.Transition, fps)
-	p.Transition = transition
-	p._OriginalTransition = transition
+	p.Transition = transitions.Get(aux.Transition, fps)
 	p.Style = aux.Style
 
 	return nil
@@ -87,11 +85,7 @@ func (p *Properties) UnmarshalYAML(bytes []byte) error {
 
 func NewProperties(properties string) (Properties, error) {
 	if properties == "" {
-		transition := transitions.Get("default", fps)
-		return Properties{
-			Transition:          transition,
-			_OriginalTransition: transition,
-		}, nil
+		return Properties{Transition: transitions.Get("default", fps)}, nil
 	}
 
 	var p Properties

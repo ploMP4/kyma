@@ -93,17 +93,19 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			m.slide = m.slide.Next
-			transition := transitions.Get(m.slide.Properties._OriginalTransition.Name(), fps)
-			m.slide.Properties.Transition = transition.Start(m.width, m.height, transitions.Forwards)
+			m.slide.ActiveTransition = m.slide.Properties.Transition.Start(m.width, m.height, transitions.Forwards)
 			return m, messages.Animate(fps)
 		} else if key.Matches(msg, m.keys.Prev) {
-			if m.slide.Prev == nil || m.slide.Properties.Transition.Animating() {
+			if m.slide.Prev == nil || m.slide.ActiveTransition.Animating() {
 				return m, nil
 			}
-			oppositeName := m.slide.Properties._OriginalTransition.Opposite().Name()
-			transition := transitions.Get(oppositeName, fps)
 			m.slide = m.slide.Prev
-			m.slide.Properties.Transition = transition.Start(m.width, m.height, transitions.Backwards)
+			m.slide.ActiveTransition = m.slide.
+				Properties.
+				Transition.
+				Opposite().
+				Start(m.width, m.height, transitions.Backwards)
+
 			return m, messages.Animate(fps)
 		}
 	case messages.FrameMsg:
