@@ -33,7 +33,7 @@ func newSwipeLeft(fps int) swipeLeft {
 	}
 }
 
-func (t swipeLeft) Start(width int, _ int) Transition {
+func (t swipeLeft) Start(width int, _ int, direction direction) Transition {
 	t.width = width
 	t.animating = true
 	t.x = 0

@@ -8,7 +8,7 @@ func newNoTransition(_ int) noTransition {
 	return noTransition{}
 }
 
-func (t noTransition) Start(width int, height int) Transition {
+func (t noTransition) Start(width int, height int, direction direction) Transition {
 	return t
 }
 

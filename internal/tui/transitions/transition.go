@@ -10,7 +10,7 @@ const (
 )
 
 type Transition interface {
-	Start(width, height int) Transition
+	Start(width, height int, direction direction) Transition
 	Animating() bool
 	Update() (Transition, tea.Cmd)
 	View(prev, next string) string
