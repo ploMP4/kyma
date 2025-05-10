@@ -17,6 +17,8 @@ func Get(name string, fps int) Transition {
 		return newSlideDown(fps)
 	case "swipeLeft":
 		return newSwipeLeft(fps)
+	case "swipeRight":
+		return newSwipeRight(fps)
 	case "flip":
 		return newFlipRight(fps)
 	default:
