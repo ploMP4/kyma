@@ -35,6 +35,7 @@ Control how the presentation moves between slides.
 Available transitions:
 
 - `swipeLeft`
+- `swipeRight`
 - `flip`
 - `slideDown`
 - `slideUp`
