@@ -8,6 +8,7 @@ require (
 	github.com/charmbracelet/glamour v0.8.0
 	github.com/charmbracelet/harmonica v0.2.0
 	github.com/charmbracelet/lipgloss v1.0.0
+	github.com/fsnotify/fsnotify v1.7.0
 	github.com/goccy/go-yaml v1.17.1
 	github.com/mattn/go-runewidth v0.0.16
 	github.com/muesli/reflow v0.3.0

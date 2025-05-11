@@ -7,12 +7,16 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
 
 	"github.com/ploMP4/kyma/internal/tui"
 )
 
+var watch bool
+
 func init() {
+	rootCmd.Flags().BoolVarP(&watch, "watch", "w", false, "Watch for changes in the input file")
 	rootCmd.AddCommand(versionCmd)
 }
 
