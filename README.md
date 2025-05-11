@@ -4,6 +4,7 @@
 
 &nbsp;
 
+> **Κῦμα** (Kyma) - _Ancient Greek_: A wave, billow, or surge; metaphorically representing the flow and movement of ideas and presentations.
 
 A terminal-based presentation tool that creates beautiful presentations from markdown files with smooth animated transitions.
 
