@@ -96,6 +96,7 @@ var rootCmd = &cobra.Command{
 										fmt.Fprintf(os.Stderr, "Error parsing slides: %v\n", err)
 										return
 									}
+									p.Send(tui.UpdateSlidesMsg{NewRoot: newRoot})
 								}()
 							}
 						}

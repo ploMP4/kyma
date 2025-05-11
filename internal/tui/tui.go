@@ -63,20 +63,43 @@ type model struct {
 	help  help.Model
 }
 
-func New(rootSlide *Slide) model {
-	return model{
+func New(rootSlide *Slide) *model {
+	return &model{
 		slide: rootSlide,
 		keys:  keys,
 		help:  help.New(),
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return tea.ClearScreen
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+type UpdateSlidesMsg struct {
+	NewRoot *Slide
+}
+
+func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case UpdateSlidesMsg:
+		// Find current position in the slide list
+		currentPosition := 0
+		for currentSlide := m.slide; currentSlide.Prev != nil; currentSlide = currentSlide.Prev {
+			currentPosition++
+		}
+
+		// Update root and navigate to the same position in the new list
+		m.slide = msg.NewRoot
+		for i := 0; i < currentPosition && m.slide != nil; i++ {
+			m.slide = m.slide.Next
+		}
+
+		// Reset state for all slides in the new list
+		for currentSlide := m.slide; currentSlide != nil; currentSlide = currentSlide.Next {
+			currentSlide.ActiveTransition = nil
+			currentSlide.Style = style(m.width, m.height, currentSlide.Properties.Style)
+		}
+		return m, nil
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
 		slide := m.slide
@@ -118,7 +141,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) View() string {
+func (m *model) View() string {
+	m.slide.Style = style(m.width, m.height, m.slide.Properties.Style)
+
 	return lipgloss.Place(
 		m.width,
 		m.height,
