@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/ploMP4/kyma/internal/tui"
+	"github.com/ploMP4/kyma/internal/tui/transitions"
 )
 
 var watch bool
@@ -51,17 +52,20 @@ var rootCmd = &cobra.Command{
 		if watch {
 			watcher, err := fsnotify.NewWatcher()
 			if err != nil {
-				return fmt.Errorf("failed to create file watcher: %w", err)
+				p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "none")})
+				return nil
 			}
 			defer watcher.Close()
 
 			absPath, err := filepath.Abs(filename)
 			if err != nil {
-				return fmt.Errorf("failed to get absolute path: %w", err)
+				p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "none")})
+				return nil
 			}
 
 			if err := watcher.Add(filepath.Dir(absPath)); err != nil {
-				return fmt.Errorf("failed to watch directory: %w", err)
+				p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "none")})
+				return nil
 			}
 
 			go func() {
@@ -87,15 +91,16 @@ var rootCmd = &cobra.Command{
 									<-debounceTimer.C
 									data, err := os.ReadFile(filename)
 									if err != nil {
-										fmt.Fprintf(os.Stderr, "Error reading file: %v\n", err)
+										p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "slideUp")})
 										return
 									}
 
 									newRoot, err := parseSlides(string(data))
 									if err != nil {
-										fmt.Fprintf(os.Stderr, "Error parsing slides: %v\n", err)
+										p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "slideUp")})
 										return
 									}
+
 									p.Send(tui.UpdateSlidesMsg{NewRoot: newRoot})
 								}()
 							}
@@ -104,7 +109,7 @@ var rootCmd = &cobra.Command{
 						if !ok {
 							return
 						}
-						fmt.Fprintf(os.Stderr, "Error watching file: %v\n", err)
+						p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "slideUp")})
 					}
 				}
 			}()
@@ -168,4 +173,13 @@ func parseSlide(s string) (slide, properties string) {
 	}
 
 	return slide, properties
+}
+
+func createErrorSlide(err error, transition string) *tui.Slide {
+	return &tui.Slide{
+		Data: fmt.Sprintf("# Error while updating\n\n%s\n\nIf you believe this is our fault, please open up an issue on GitHub", err.Error()),
+		Properties: tui.Properties{
+			Transition: transitions.Get(transition, tui.Fps),
+		},
+	}
 }
