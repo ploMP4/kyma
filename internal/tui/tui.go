@@ -101,6 +101,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.slide = m.slide.Prev
 			m.slide.ActiveTransition = m.slide.
+				Next.
 				Properties.
 				Transition.
 				Opposite().
