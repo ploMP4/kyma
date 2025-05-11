@@ -77,7 +77,7 @@ func (p *Properties) UnmarshalYAML(bytes []byte) error {
 	if err := yaml.Unmarshal(bytes, &aux); err != nil {
 		return err
 	}
-	p.Transition = transitions.Get(aux.Transition, fps)
+	p.Transition = transitions.Get(aux.Transition, Fps)
 	p.Style = aux.Style
 
 	return nil
@@ -85,7 +85,7 @@ func (p *Properties) UnmarshalYAML(bytes []byte) error {
 
 func NewProperties(properties string) (Properties, error) {
 	if properties == "" {
-		return Properties{Transition: transitions.Get("default", fps)}, nil
+		return Properties{Transition: transitions.Get("default", Fps)}, nil
 	}
 
 	var p Properties

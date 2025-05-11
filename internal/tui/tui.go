@@ -39,7 +39,7 @@ var keys = keyMap{
 	),
 }
 
-const fps = 60
+const Fps = 60
 
 func style(width, height int, extra StyleConfig) lipgloss.Style {
 	borderColor := "#9999CC" // Blueish
@@ -117,7 +117,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.slide = m.slide.Next
 			m.slide.ActiveTransition = m.slide.Properties.Transition.Start(m.width, m.height, transitions.Forwards)
-			return m, messages.Animate(fps)
+			return m, messages.Animate(Fps)
 		} else if key.Matches(msg, m.keys.Prev) {
 			if m.slide.Prev == nil || m.slide.ActiveTransition != nil && m.slide.ActiveTransition.Animating() {
 				return m, nil
@@ -130,7 +130,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				Opposite().
 				Start(m.width, m.height, transitions.Backwards)
 
-			return m, messages.Animate(fps)
+			return m, messages.Animate(Fps)
 		}
 	case messages.FrameMsg:
 		slide, cmd := m.slide.Update()
