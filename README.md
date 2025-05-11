@@ -1,10 +1,15 @@
 <div align="center">
-  <img src="kyma_logo.svg" alt="SVG Image">
+  <img src="kyma_logo.svg" alt="SVG Image" width=50%>
 </div>
+
+&nbsp;
+
 
 A terminal-based presentation tool that creates beautiful presentations from markdown files with smooth animated transitions.
 
-![slideshow](slideshow.gif)
+<div align="center">
+  <img src="slideshow.gif" alt="slideshow" width=80%>
+</div>
 
 ## Features
 
