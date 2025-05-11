@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/fsnotify/fsnotify"
@@ -46,6 +47,68 @@ var rootCmd = &cobra.Command{
 		}
 
 		p := tea.NewProgram(tui.New(root), tea.WithAltScreen(), tea.WithMouseAllMotion())
+
+		if watch {
+			watcher, err := fsnotify.NewWatcher()
+			if err != nil {
+				return fmt.Errorf("failed to create file watcher: %w", err)
+			}
+			defer watcher.Close()
+
+			absPath, err := filepath.Abs(filename)
+			if err != nil {
+				return fmt.Errorf("failed to get absolute path: %w", err)
+			}
+
+			if err := watcher.Add(filepath.Dir(absPath)); err != nil {
+				return fmt.Errorf("failed to watch directory: %w", err)
+			}
+
+			go func() {
+				var debounceTimer *time.Timer
+
+				for {
+					select {
+					case event, ok := <-watcher.Events:
+						if !ok {
+							return
+						}
+
+						if event.Name == absPath || event.Name == filename ||
+							strings.HasSuffix(event.Name, "~") ||
+							strings.HasPrefix(event.Name, absPath+".") {
+							if event.Has(fsnotify.Write) || event.Has(fsnotify.Create) {
+								if debounceTimer != nil {
+									debounceTimer.Stop()
+								}
+								debounceTimer = time.NewTimer(100 * time.Millisecond)
+
+								go func() {
+									<-debounceTimer.C
+									data, err := os.ReadFile(filename)
+									if err != nil {
+										fmt.Fprintf(os.Stderr, "Error reading file: %v\n", err)
+										return
+									}
+
+									newRoot, err := parseSlides(string(data))
+									if err != nil {
+										fmt.Fprintf(os.Stderr, "Error parsing slides: %v\n", err)
+										return
+									}
+								}()
+							}
+						}
+					case err, ok := <-watcher.Errors:
+						if !ok {
+							return
+						}
+						fmt.Fprintf(os.Stderr, "Error watching file: %v\n", err)
+					}
+				}
+			}()
+		}
+
 		if _, err := p.Run(); err != nil {
 			return err
 		}
