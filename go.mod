@@ -1,4 +1,4 @@
-module github.com/ploMP4/kyma
+module github.com/museslabs/kyma
 
 go 1.24.1
 

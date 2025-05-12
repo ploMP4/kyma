@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/ploMP4/kyma/internal/skip"
+	"github.com/museslabs/kyma/internal/skip"
 )
 
 func TestNewWriter(t *testing.T) {

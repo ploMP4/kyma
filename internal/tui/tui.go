@@ -6,7 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/ploMP4/kyma/internal/tui/transitions"
+	"github.com/museslabs/kyma/internal/tui/transitions"
 )
 
 type keyMap struct {

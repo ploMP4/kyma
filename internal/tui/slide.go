@@ -7,10 +7,8 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/goccy/go-yaml"
-
-	"github.com/ploMP4/kyma/internal/tui/transitions"
+	"github.com/museslabs/kyma/internal/tui/transitions"
 )
-
 
 type Slide struct {
 	Data             string

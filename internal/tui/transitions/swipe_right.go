@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/harmonica"
 	"github.com/muesli/reflow/truncate"
 
-	"github.com/ploMP4/kyma/internal/skip"
+	"github.com/museslabs/kyma/internal/skip"
 )
 
 type swipeRight struct {

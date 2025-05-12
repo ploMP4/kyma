@@ -11,8 +11,8 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
 
-	"github.com/ploMP4/kyma/internal/tui"
-	"github.com/ploMP4/kyma/internal/tui/transitions"
+	"github.com/museslabs/kyma/internal/tui"
+	"github.com/museslabs/kyma/internal/tui/transitions"
 )
 
 var watch bool
@@ -176,7 +176,10 @@ func parseSlide(s string) (slide, properties string) {
 
 func createErrorSlide(err error, transition string) *tui.Slide {
 	return &tui.Slide{
-		Data: fmt.Sprintf("# Error while updating\n\n%s\n\nIf you believe this is our fault, please open up an issue on GitHub", err.Error()),
+		Data: fmt.Sprintf(
+			"# Error while updating\n\n%s\n\nIf you believe this is our fault, please open up an issue on GitHub",
+			err.Error(),
+		),
 		Properties: tui.Properties{
 			Transition: transitions.Get(transition, tui.Fps),
 		},

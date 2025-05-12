@@ -30,13 +30,13 @@ A terminal-based presentation tool that creates beautiful presentations from mar
 ### Using Go
 
 ```bash
-go install github.com/ploMP4/kyma@latest
+go install github.com/museslabs/kyma@latest
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/ploMP4/kyma.git
+git clone https://github.com/museslabs/kyma.git
 cd kyma
 go build -o kyma
 ```

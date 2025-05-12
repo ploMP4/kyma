@@ -1,6 +1,6 @@
 package main
 
-import "github.com/ploMP4/kyma/cmd"
+import "github.com/museslabs/kyma/cmd"
 
 func main() {
 	cmd.Execute()
