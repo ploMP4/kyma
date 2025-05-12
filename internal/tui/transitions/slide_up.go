@@ -8,7 +8,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/harmonica"
 
-	"github.com/ploMP4/kyma/internal/tui/messages"
 )
 
 type slideUp struct {
@@ -54,7 +53,7 @@ func (t slideUp) Update() (Transition, tea.Cmd) {
 		return t, nil
 	}
 
-	return t, messages.Animate(time.Duration(t.fps))
+	return t, Animate(time.Duration(t.fps))
 }
 
 func (t slideUp) View(prev, next string) string {

@@ -5,14 +5,20 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
 
 	"github.com/ploMP4/kyma/internal/tui"
+	"github.com/ploMP4/kyma/internal/tui/transitions"
 )
 
+var watch bool
+
 func init() {
+	rootCmd.Flags().BoolVarP(&watch, "watch", "w", false, "Watch for changes in the input file")
 	rootCmd.AddCommand(versionCmd)
 }
 
@@ -42,12 +48,78 @@ var rootCmd = &cobra.Command{
 		}
 
 		p := tea.NewProgram(tui.New(root), tea.WithAltScreen(), tea.WithMouseAllMotion())
+
+		if watch {
+			watcher, err := fsnotify.NewWatcher()
+			if err != nil {
+				p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "none")})
+				return nil
+			}
+			defer watcher.Close()
+
+			absPath, err := filepath.Abs(filename)
+			if err != nil {
+				p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "none")})
+				return nil
+			}
+
+			if err := watcher.Add(filepath.Dir(absPath)); err != nil {
+				p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "none")})
+			}
+
+			go watchFileChanges(watcher, p, filename, absPath)
+		}
+
 		if _, err := p.Run(); err != nil {
 			return err
 		}
 
 		return nil
 	},
+}
+
+func watchFileChanges(watcher *fsnotify.Watcher, p *tea.Program, filename, absPath string) {
+	var debounceTimer *time.Timer
+
+	for {
+		select {
+		case event, ok := <-watcher.Events:
+			if !ok {
+				return
+			}
+
+			if event.Name == absPath || event.Name == filename ||
+				strings.HasSuffix(event.Name, "~") ||
+				strings.HasPrefix(event.Name, absPath+".") {
+
+				if event.Has(fsnotify.Write) || event.Has(fsnotify.Create) {
+					if debounceTimer != nil {
+						debounceTimer.Stop()
+					}
+					debounceTimer = time.AfterFunc(100*time.Millisecond, func() {
+						data, err := os.ReadFile(filename)
+						if err != nil {
+							p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "none")})
+							return
+						}
+
+						newRoot, err := parseSlides(string(data))
+						if err != nil {
+							p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "none")})
+							return
+						}
+
+						p.Send(tui.UpdateSlidesMsg{NewRoot: newRoot})
+					})
+				}
+			}
+		case err, ok := <-watcher.Errors:
+			if !ok {
+				return
+			}
+			p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "none")})
+		}
+	}
 }
 
 func Execute() {
@@ -100,4 +172,13 @@ func parseSlide(s string) (slide, properties string) {
 	}
 
 	return slide, properties
+}
+
+func createErrorSlide(err error, transition string) *tui.Slide {
+	return &tui.Slide{
+		Data: fmt.Sprintf("# Error while updating\n\n%s\n\nIf you believe this is our fault, please open up an issue on GitHub", err.Error()),
+		Properties: tui.Properties{
+			Transition: transitions.Get(transition, tui.Fps),
+		},
+	}
 }

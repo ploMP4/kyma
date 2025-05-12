@@ -11,6 +11,7 @@ import (
 	"github.com/ploMP4/kyma/internal/tui/transitions"
 )
 
+
 type Slide struct {
 	Data             string
 	Prev             *Slide
@@ -20,6 +21,10 @@ type Slide struct {
 	Properties       Properties
 
 	preRenderedFrame string
+}
+
+type UpdateSlidesMsg struct {
+	NewRoot *Slide
 }
 
 func (s *Slide) Update() (*Slide, tea.Cmd) {
@@ -77,7 +82,7 @@ func (p *Properties) UnmarshalYAML(bytes []byte) error {
 	if err := yaml.Unmarshal(bytes, &aux); err != nil {
 		return err
 	}
-	p.Transition = transitions.Get(aux.Transition, fps)
+	p.Transition = transitions.Get(aux.Transition, Fps)
 	p.Style = aux.Style
 
 	return nil
@@ -85,7 +90,7 @@ func (p *Properties) UnmarshalYAML(bytes []byte) error {
 
 func NewProperties(properties string) (Properties, error) {
 	if properties == "" {
-		return Properties{Transition: transitions.Get("default", fps)}, nil
+		return Properties{Transition: transitions.Get("default", Fps)}, nil
 	}
 
 	var p Properties

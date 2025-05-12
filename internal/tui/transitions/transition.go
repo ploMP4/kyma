@@ -1,6 +1,10 @@
 package transitions
 
-import tea "github.com/charmbracelet/bubbletea"
+import (
+	"time"
+
+	tea "github.com/charmbracelet/bubbletea"
+)
 
 type direction byte
 
@@ -8,6 +12,14 @@ const (
 	Forwards  direction = 0
 	Backwards direction = 1
 )
+
+type FrameMsg time.Time
+
+func Animate(fps time.Duration) tea.Cmd {
+	return tea.Tick(time.Second/fps, func(t time.Time) tea.Msg {
+		return FrameMsg(t)
+	})
+}
 
 type Transition interface {
 	Start(width, height int, direction direction) Transition
