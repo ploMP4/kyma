@@ -85,10 +85,7 @@ var rootCmd = &cobra.Command{
 								if debounceTimer != nil {
 									debounceTimer.Stop()
 								}
-								debounceTimer = time.NewTimer(100 * time.Millisecond)
-
-								go func() {
-									<-debounceTimer.C
+								debounceTimer = time.AfterFunc(100*time.Millisecond, func() {
 									data, err := os.ReadFile(filename)
 									if err != nil {
 										p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "slideUp")})
@@ -102,7 +99,7 @@ var rootCmd = &cobra.Command{
 									}
 
 									p.Send(tui.UpdateSlidesMsg{NewRoot: newRoot})
-								}()
+								})
 							}
 						}
 					case err, ok := <-watcher.Errors:
