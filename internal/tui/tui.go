@@ -63,15 +63,15 @@ type model struct {
 	help  help.Model
 }
 
-func New(rootSlide *Slide) *model {
-	return &model{
+func New(rootSlide *Slide) model {
+	return model{
 		slide: rootSlide,
 		keys:  keys,
 		help:  help.New(),
 	}
 }
 
-func (m *model) Init() tea.Cmd {
+func (m model) Init() tea.Cmd {
 	return tea.ClearScreen
 }
 
@@ -79,12 +79,12 @@ type UpdateSlidesMsg struct {
 	NewRoot *Slide
 }
 
-func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case UpdateSlidesMsg:
 		// Find current position in the slide list
 		currentPosition := 0
-		for currentSlide := m.slide; currentSlide.Prev != nil; currentSlide = currentSlide.Prev {
+		for currentSlide := m.slide; currentSlide != nil && currentSlide.Prev != nil; currentSlide = currentSlide.Prev {
 			currentPosition++
 		}
 
@@ -141,7 +141,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m *model) View() string {
+func (m model) View() string {
 	m.slide.Style = style(m.width, m.height, m.slide.Properties.Style)
 
 	return lipgloss.Place(
