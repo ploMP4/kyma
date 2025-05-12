@@ -113,7 +113,7 @@ style:
   layout: center       # Layout positioning: center, left, right, top, bottom
 ```
 
-Layout can also be specified as a combination: `layout: center,middle`
+Layout can also be specified as a combination: `layout: center,right`
 
 ## Contributing
 
@@ -126,14 +126,6 @@ All contributions are welcome! If you're planning a significant change or you're
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
-## Testing
-
-Run the tests with:
-
-```bash
-go test ./...
-```
 
 ## Acknowledgements
 
