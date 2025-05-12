@@ -65,51 +65,9 @@ var rootCmd = &cobra.Command{
 
 			if err := watcher.Add(filepath.Dir(absPath)); err != nil {
 				p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "none")})
-				return nil
 			}
 
-			go func() {
-				var debounceTimer *time.Timer
-
-				for {
-					select {
-					case event, ok := <-watcher.Events:
-						if !ok {
-							return
-						}
-
-						if event.Name == absPath || event.Name == filename ||
-							strings.HasSuffix(event.Name, "~") ||
-							strings.HasPrefix(event.Name, absPath+".") {
-							if event.Has(fsnotify.Write) || event.Has(fsnotify.Create) {
-								if debounceTimer != nil {
-									debounceTimer.Stop()
-								}
-								debounceTimer = time.AfterFunc(100*time.Millisecond, func() {
-									data, err := os.ReadFile(filename)
-									if err != nil {
-										p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "slideUp")})
-										return
-									}
-
-									newRoot, err := parseSlides(string(data))
-									if err != nil {
-										p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "slideUp")})
-										return
-									}
-
-									p.Send(tui.UpdateSlidesMsg{NewRoot: newRoot})
-								})
-							}
-						}
-					case err, ok := <-watcher.Errors:
-						if !ok {
-							return
-						}
-						p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "slideUp")})
-					}
-				}
-			}()
+			go watchFileChanges(watcher, p, filename, absPath)
 		}
 
 		if _, err := p.Run(); err != nil {
@@ -118,6 +76,50 @@ var rootCmd = &cobra.Command{
 
 		return nil
 	},
+}
+
+func watchFileChanges(watcher *fsnotify.Watcher, p *tea.Program, filename, absPath string) {
+	var debounceTimer *time.Timer
+
+	for {
+		select {
+		case event, ok := <-watcher.Events:
+			if !ok {
+				return
+			}
+
+			if event.Name == absPath || event.Name == filename ||
+				strings.HasSuffix(event.Name, "~") ||
+				strings.HasPrefix(event.Name, absPath+".") {
+
+				if event.Has(fsnotify.Write) || event.Has(fsnotify.Create) {
+					if debounceTimer != nil {
+						debounceTimer.Stop()
+					}
+					debounceTimer = time.AfterFunc(100*time.Millisecond, func() {
+						data, err := os.ReadFile(filename)
+						if err != nil {
+							p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "none")})
+							return
+						}
+
+						newRoot, err := parseSlides(string(data))
+						if err != nil {
+							p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "none")})
+							return
+						}
+
+						p.Send(tui.UpdateSlidesMsg{NewRoot: newRoot})
+					})
+				}
+			}
+		case err, ok := <-watcher.Errors:
+			if !ok {
+				return
+			}
+			p.Send(tui.UpdateSlidesMsg{NewRoot: createErrorSlide(err, "none")})
+		}
+	}
 }
 
 func Execute() {
