@@ -9,8 +9,6 @@ import (
 	"github.com/charmbracelet/harmonica"
 	"github.com/muesli/reflow/truncate"
 	"github.com/muesli/reflow/wordwrap"
-
-	"github.com/ploMP4/kyma/internal/tui/messages"
 )
 
 type flipRight struct {
@@ -56,7 +54,7 @@ func (t flipRight) Update() (Transition, tea.Cmd) {
 		return t, nil
 	}
 
-	return t, messages.Animate(time.Duration(t.fps))
+	return t, Animate(time.Duration(t.fps))
 }
 
 func (t flipRight) View(prev string, next string) string {

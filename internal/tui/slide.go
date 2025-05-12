@@ -11,6 +11,7 @@ import (
 	"github.com/ploMP4/kyma/internal/tui/transitions"
 )
 
+
 type Slide struct {
 	Data             string
 	Prev             *Slide
@@ -20,6 +21,10 @@ type Slide struct {
 	Properties       Properties
 
 	preRenderedFrame string
+}
+
+type UpdateSlidesMsg struct {
+	NewRoot *Slide
 }
 
 func (s *Slide) Update() (*Slide, tea.Cmd) {

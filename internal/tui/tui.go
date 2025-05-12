@@ -6,7 +6,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/ploMP4/kyma/internal/tui/messages"
 	"github.com/ploMP4/kyma/internal/tui/transitions"
 )
 
@@ -75,10 +74,6 @@ func (m model) Init() tea.Cmd {
 	return tea.ClearScreen
 }
 
-type UpdateSlidesMsg struct {
-	NewRoot *Slide
-}
-
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case UpdateSlidesMsg:
@@ -117,7 +112,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.slide = m.slide.Next
 			m.slide.ActiveTransition = m.slide.Properties.Transition.Start(m.width, m.height, transitions.Forwards)
-			return m, messages.Animate(Fps)
+			return m, transitions.Animate(Fps)
 		} else if key.Matches(msg, m.keys.Prev) {
 			if m.slide.Prev == nil || m.slide.ActiveTransition != nil && m.slide.ActiveTransition.Animating() {
 				return m, nil
@@ -130,9 +125,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				Opposite().
 				Start(m.width, m.height, transitions.Backwards)
 
-			return m, messages.Animate(Fps)
+			return m, transitions.Animate(Fps)
 		}
-	case messages.FrameMsg:
+	case transitions.FrameMsg:
 		slide, cmd := m.slide.Update()
 		m.slide = slide
 		return m, cmd

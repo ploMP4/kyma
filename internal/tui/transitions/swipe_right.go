@@ -10,7 +10,6 @@ import (
 	"github.com/muesli/reflow/truncate"
 
 	"github.com/ploMP4/kyma/internal/skip"
-	"github.com/ploMP4/kyma/internal/tui/messages"
 )
 
 type swipeRight struct {
@@ -56,7 +55,7 @@ func (t swipeRight) Update() (Transition, tea.Cmd) {
 		return t, nil
 	}
 
-	return t, messages.Animate(time.Duration(t.fps))
+	return t, Animate(time.Duration(t.fps))
 }
 
 func (t swipeRight) View(prev string, next string) string {
