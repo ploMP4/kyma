@@ -14,7 +14,7 @@ type Slide struct {
 	Data             string
 	Prev             *Slide
 	Next             *Slide
-	Style            lipgloss.Style
+	Style            SlideStyle
 	ActiveTransition transitions.Transition
 	Properties       Properties
 
@@ -45,7 +45,13 @@ func (s Slide) View() string {
 func (s Slide) view() string {
 	var b strings.Builder
 
-	out, err := glamour.Render(s.Data, "dark")
+	themeName := "dark"
+
+	if s.Style.Theme.Name != "" {
+		themeName = s.Style.Theme.Name
+	}
+
+	out, err := glamour.Render(s.Data, themeName)
 	if err != nil {
 		b.WriteString("\n\n" + lipgloss.NewStyle().
 			Foreground(lipgloss.Color("9")). // Red
@@ -56,12 +62,12 @@ func (s Slide) view() string {
 	if s.ActiveTransition != nil && s.ActiveTransition.Animating() {
 		direction := s.ActiveTransition.Direction()
 		if direction == transitions.Backwards {
-			b.WriteString(s.ActiveTransition.View(s.Next.View(), s.Style.Render(out)))
+			b.WriteString(s.ActiveTransition.View(s.Next.View(), s.Style.LipGlossStyle.Render(out)))
 		} else {
-			b.WriteString(s.ActiveTransition.View(s.Prev.View(), s.Style.Render(out)))
+			b.WriteString(s.ActiveTransition.View(s.Prev.View(), s.Style.LipGlossStyle.Render(out)))
 		}
 	} else {
-		b.WriteString(s.Style.Render(out))
+		b.WriteString(s.Style.LipGlossStyle.Render(out))
 	}
 	return b.String()
 }

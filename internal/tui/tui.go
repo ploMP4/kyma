@@ -40,17 +40,8 @@ var keys = keyMap{
 
 const Fps = 60
 
-func style(width, height int, extra StyleConfig) lipgloss.Style {
-	borderColor := "#9999CC" // Blueish
-	if extra.BorderColor != "" {
-		borderColor = extra.BorderColor
-	}
-
-	return extra.Layout.
-		Border(extra.Border).
-		BorderForeground(lipgloss.Color(borderColor)).
-		Width(width - 4).
-		Height(height - 2)
+func style(width, height int, config StyleConfig) SlideStyle {
+	return config.ApplyStyle(width, height)
 }
 
 type model struct {
