@@ -22,6 +22,7 @@ A terminal-based presentation tool that creates beautiful presentations from mar
   - Flip effects
 - **Hot reload**: Live reloading of presentation files during editing with the `-w` flag
 - **Customizable styling**: Configure borders, colors, and layouts via YAML front matter
+- **Theme support**: Choose from built-in Glamour themes or load custom JSON theme files
 - **Flexible layouts**: Center, align, and position content with various layout options
 - **Simple navigation**: Intuitive keyboard controls for presentation flow (vim style btw)
 
@@ -87,10 +88,20 @@ style:
   border: rounded
   border_color: "#9999CC"
   layout: center
+  theme: dracula
 ---
 
 # Third Slide
-This slide has custom styling
+This slide has custom styling with Dracula theme
+
+----
+---
+style:
+  theme: /path/to/custom-theme.json
+---
+
+# Fourth Slide
+This slide uses a custom JSON theme file
 ```
 
 ### Available Transitions
@@ -108,12 +119,39 @@ You can customize each slide's appearance using the style configuration:
 
 ```yaml
 style:
-  border: rounded      # Border style: normal, rounded, double, thick, hidden, block
-  border_color: "#FF0000"  # Hex color for border
-  layout: center       # Layout positioning: center, left, right, top, bottom
+  border: rounded          # Border style: normal, rounded, double, thick, hidden, block
+  border_color: "#FF0000"  # Hex color for border (or "default" for theme-based color)
+  layout: center           # Layout positioning: center, left, right, top, bottom
+  theme: dracula           # Theme name or path to custom JSON theme file
 ```
 
 Layout can also be specified as a combination: `layout: center,right`
+
+### Theme Support
+
+Kyma supports both built-in Glamour themes and custom JSON theme files:
+
+#### Built-in Themes
+
+- `ascii` - ASCII-only styling
+- `auto` - Automatically detected theme
+- `dark` - Dark theme (default)
+- `dracula` - Dracula color scheme
+- `tokyo-night` (or `tokyonight`) - Tokyo Night theme
+- `light` - Light theme
+- `notty` - Plain text styling
+- `pink` - Pink color scheme
+
+#### Custom JSON Themes
+
+You can create custom themes by providing a path to a JSON file that follows the Glamour `StyleConfig` format. If the theme name doesn't match a built-in theme, Kyma will attempt to load it as a JSON file:
+
+```yaml
+style:
+  theme: ./themes/my-custom-theme.json
+```
+
+The border color will automatically adapt to use the theme's H1 background color unless explicitly overridden with `border_color`.
 
 ## Contributing
 
@@ -140,7 +178,8 @@ All contributions are welcome! If you're planning a significant change or you're
 ## Roadmap
 
 - Add support for more style options like text color and background color
-- Allow choosing from any glamour themes
+- ~~Allow choosing from any glamour themes~~ ✅ **Done!**
+- ~~Support for custom JSON theme files~~ ✅ **Done!**
 - Create grid-based slide layouts with transitions for each pane  
 - Add more transition effects
 - Support image rendering in terminals (e.g., via the Kitty protocol)
