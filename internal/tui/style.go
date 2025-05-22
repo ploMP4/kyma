@@ -158,7 +158,7 @@ func getTheme(theme string) GlamourTheme {
 		return GlamourTheme{Style: styles.DarkStyleConfig, Name: "dark"}
 	case "dracula":
 		return GlamourTheme{Style: styles.DraculaStyleConfig, Name: "dracula"}
-	case "tokyo-night":
+	case "tokyo-night", "tokyonight":
 		return GlamourTheme{Style: styles.TokyoNightStyleConfig, Name: "tokyo-night"}
 	case "light":
 		return GlamourTheme{Style: styles.LightStyleConfig, Name: "light"}
