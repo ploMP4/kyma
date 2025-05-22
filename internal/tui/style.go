@@ -1,7 +1,9 @@
 package tui
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/charmbracelet/glamour/ansi"
@@ -150,23 +152,32 @@ func getLayoutPosition(p string) (lipgloss.Position, error) {
 	}
 }
 
+const (
+	AsciiStyle      = "ascii"
+	AutoStyle       = "auto"
+	DarkStyle       = "dark"
+	DraculaStyle    = "dracula"
+	TokyoNightStyle = "tokyo-night"
+	LightStyle      = "light"
+	NoTTYStyle      = "notty"
+	PinkStyle       = "pink"
+)
+
 func getTheme(theme string) GlamourTheme {
-	switch theme {
-	case "ascii":
-		return GlamourTheme{Style: styles.ASCIIStyleConfig, Name: "ascii"}
-	case "dark":
-		return GlamourTheme{Style: styles.DarkStyleConfig, Name: "dark"}
-	case "dracula":
-		return GlamourTheme{Style: styles.DraculaStyleConfig, Name: "dracula"}
-	case "tokyo-night", "tokyonight":
-		return GlamourTheme{Style: styles.TokyoNightStyleConfig, Name: "tokyo-night"}
-	case "light":
-		return GlamourTheme{Style: styles.LightStyleConfig, Name: "light"}
-	case "notty":
-		return GlamourTheme{Style: styles.NoTTYStyleConfig, Name: "notty"}
-	case "pink":
-		return GlamourTheme{Style: styles.PinkStyleConfig, Name: "pink"}
-	default:
-		return GlamourTheme{Style: styles.DarkStyleConfig, Name: "dark"}
+	style, ok := styles.DefaultStyles[theme]
+	if !ok {
+		jsonBytes, err := os.ReadFile(theme)
+		if err != nil {
+			return GlamourTheme{Style: styles.DarkStyleConfig, Name: "dark"}
+		}
+
+		var customStyle ansi.StyleConfig
+		if err := json.Unmarshal(jsonBytes, &customStyle); err != nil {
+			return GlamourTheme{Style: styles.DarkStyleConfig, Name: "dark"}
+		}
+
+		return GlamourTheme{Style: customStyle, Name: theme}
 	}
+
+	return GlamourTheme{Style: *style, Name: theme}
 }
