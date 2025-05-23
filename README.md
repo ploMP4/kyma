@@ -151,7 +151,9 @@ style:
   theme: ./themes/my-custom-theme.json
 ```
 
-The border color will automatically adapt to use the theme's H1 background color unless explicitly overridden with `border_color`.
+The border color will automatically adapt to use the theme's H1 background color unless explicitly overridden with `border_color`.o
+
+For more info on how to create custom styles, you can refer to [Glamour's](https://github.com/charmbracelet/glamour/tree/master/styles) documentation.
 
 ## Contributing
 
