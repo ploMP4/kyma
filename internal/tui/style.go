@@ -152,17 +152,6 @@ func getLayoutPosition(p string) (lipgloss.Position, error) {
 	}
 }
 
-const (
-	AsciiStyle      = "ascii"
-	AutoStyle       = "auto"
-	DarkStyle       = "dark"
-	DraculaStyle    = "dracula"
-	TokyoNightStyle = "tokyo-night"
-	LightStyle      = "light"
-	NoTTYStyle      = "notty"
-	PinkStyle       = "pink"
-)
-
 func getTheme(theme string) GlamourTheme {
 	style, ok := styles.DefaultStyles[theme]
 	if !ok {
